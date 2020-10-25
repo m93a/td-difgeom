@@ -1,0 +1,358 @@
+% !TEX program = xelatex
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[czech]{babel}
+\usepackage[top = 1.5cm, bottom = 1.5cm, left = 2cm, right = 2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{letltxmacro}
+\usepackage{bbm}
+\usepackage{accents}
+\usepackage{wrapfig}
+
+
+% import obrázků z Inkscape
+% podle návodu na https://castel.dev/post/lecture-notes-2/
+\usepackage{import}
+\usepackage{xifthen}
+\usepackage{pdfpages}
+\usepackage{transparent}
+
+\newcommand{\incfig}[1]{%
+    \def\svgwidth{\columnwidth}
+    \import{./figures/}{#1.pdf_tex}
+}
+
+
+
+\newtheorem{theorem}{Věta}[section]
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definice}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem*{remark}{Poznámka}
+\newtheorem*{example}{Příklad}
+\newtheorem{corollary}[theorem]{Důsledek}
+\newtheorem*{exercise}{Cvičení}
+
+\def\ph{\phantom}
+\def\vph{\vphantom}
+\def\hph{\hphantom}
+\def\rzw{\mathrlap}
+\def\lzw{\mathllap}
+\def\czw{\mathclap}
+\newcommand*{\mask}[2]{\mathord{\makebox[\widthof{\(#1\)}]{\(#2\)}}}
+
+\newcommand{\const}[1]{\mathrm{#1}}
+\newcommand{\konst}{\const{konst.}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\innerprod}[2]{\big< #1, #2 \big>}
+\renewcommand{\d}[1]{\const{d} #1}
+\newcommand{\dd}[2]{\frac{\const{d} #1}{\const{d} #2}}
+\newcommand{\pd}[2]{\frac{\partial  #1}{\partial  #2}}
+\newcommand{\e}[1]{\const{e}^{#1}}
+\renewcommand{\i}{\const{i}}
+\renewcommand{\dot}[1]{\accentset{\bullet}{#1}}
+\newcommand{\f}{\varphi}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\def\Cont{\mathcal{C}}
+\def\Schwartz{\mathcal{S}}
+\def\Atlas{\mathcal{A}}
+\def\Manif{\mathcal{M}}
+\def\Func{\mathcal{F}}
+\def\Tang{\mathbb{T}}
+\def\Field{\mathcal{T}}
+
+\newcommand{\di}[1]{\mathchar22\mkern-11mu \mathrm{d} #1}
+\newcommand{\Pd}[3]{
+    \vph{\Bigg|}
+    \bigg(
+        \hspace{-2pt}
+        \pd{#1}{#2}
+        \hspace{-2pt}
+    \bigg)_{
+        \hspace{-3pt} #3
+    }
+}
+
+\newcommand{\mat}[1]{
+    \begin{pmatrix}
+        #1
+    \end{pmatrix}
+}
+
+\newcommand{\mata}[2]{
+    \left(
+    \begin{array}{@{}#1@{}}
+        #2
+    \end{array}
+    \right)
+}
+
+\newcommand{\smat}[2][1]{
+    \scalebox{#1}{$\mat{#2}$}
+}
+
+\def\kB{\const{k}_\const{B}}
+
+
+\title{Termodynamika v jazyce diferenciální geometrie}
+\author{Michal Grňo}
+\date{říjen 2020}
+
+\begin{document}
+
+\maketitle
+
+\section{Úvod}
+V tomto krátkém textu se budu snažit formulovat základy termodynamiky v jazyce diferenciální geometrie a přesvědčit čtenáře, že tento přístup skýtá velmi užitečné vizuální intuice, které se ve standardním kurzu snadno ztratí. Tento text se nesnaží být kompletním studijním materiálem ke kurzům termodynamiky ani diferenciální geometrie a z obou těchto fascinujících oborů představuje pouze úplné základy. Zájemcům o hlubší porozumění doporučuji skvělé knihy \textit{J. Luscombe – Thermodynamics} a \textit{M. Fecko – Diferenciálna geometria a Lieove grupy pre fyzikov}.
+
+\section{Tečný a kotečný prostor}
+Centrálním pojmem diferenciální geometrie je \textit{varieta}. V termodynamice hrají variety roli \textit{stavových prostorů}, tedy prostorů všech makroskopických stavů, ve kterých se systém může nacházet.
+
+\begin{definition}[Topologický prostor]
+Topologický prostor je dvojice $(X, \tau)$, kde $X$ je množina všech bodů a $\tau$ je systém podmnožin $X$ splňující několik nezajímavých pravidel\footnote{1. $\emptyset \in \tau$, 2. $X \in \tau$, 3. sjednocení jakýchkoliv prvků $\tau$ je opět prvek $\tau$, 4. průnik konečně mnoha prvků $\tau$ je opět prvek $\tau$.}. Systém $\tau$ udává, jaké podmnožiny $X$ považujeme za otevřené množiny a typicky je generovaný nějakou mírou na $X$.
+\end{definition}
+
+\begin{definition}[Mapa]
+Mějme topologický prostor $X$ a na něm nějakou otevřenou podmnožinu $\Omega$. Zobrazení
+\begin{equation*}
+    \phi: \Omega \to \phi(\Omega) \subset \R^n,
+\end{equation*}
+které je spojité\footnote{Zobrazení mezi dvěma topologickými prostory se nazývá spojité, pokud vzor každé otevřené množiny je otevřená množina.}, invertovatelné a jeho inverze je také spojitá, nazýváme \textit{mapou} na prostoru $X$. Mapa jednoznačně identifikuje body $X$ pomocí $n$-tice reálných čísel – \textit{souřadnic}.
+\end{definition}
+
+\vspace{3\baselineskip}
+
+\begin{figure}[h!]
+    \centering
+    \incfig{01_prechod}
+    \caption{Zobrazení $\psi \, \circ \, \phi^{-1}$ je \textit{změna souřadnic}, transformace ze souřadnic mapy $\phi$ do souřadnic mapy $\psi$. Požadavek na $\Cont^k$-atlas je tedy požadavkem, aby přechody mezi všemi souřadnicemi, které budeme používat, byly~$\Cont^k$.}
+    \label{obr:prechod}
+\end{figure}
+
+\pagebreak
+
+\begin{definition}[Maximální $\Cont^k$-atlas]
+Buď $X$ topologický prostor a $k \in \mathbb{N} \cup \{\infty\}$. Mějme množinu $\Atlas = \{\phi, \psi, ... \}$ map na $X$ takovou, že pro každou dvojici map platí $\psi \circ \phi^{-1} \in \Cont^k$ všude, kde má výraz smysl\footnote{Tedy na $\phi(\const{D}_\psi \cap \const{D}_\phi)$, kde $\const{D}_f$ značí definiční obor zobrazení $f$.}. Množinu $\Atlas$ nazýváme \textit{$\Cont^k$-atlas} na $X$. Pokud navíc neexistuje žádné zobrazení, které bychom mohli do $\Atlas$ přidat, aniž bychom tím pokazili tuto vlastnost, potom je $\Atlas$ \textit{maximální} $\Cont^k$-atlas na $X$.
+\end{definition}
+
+\begin{definition}[$\Cont^k$ varieta, $\Manif$]
+Buď $X$ topologický prostor a $\Atlas$ maximální $\Cont^k$ atlas na něm. Dvojice $\Manif = (X, \Atlas)$ se~nazývá \textit{$\Cont^k$ varieta}. $\Cont^\infty$ varietě se také říká \textit{hladká} varieta.
+\end{definition}
+
+Varieta je poměrně obecný pojem, který nám umožňuje mluvit i o exotických objektech, jako je Kleinova lahev nebo Whiteheadův manifold. V termodynamice hrají variety roli stavových prostorů, vždy si ovšem vystačíme s velmi „obyčejnými“ varietami, které jsou izomorfní $\R^n$. Detaily zavedení variet se tedy nemusíme příliš zabývat. Důležitým shrnutím je, že budeme pracovat s prostorem $\Manif$, na kterém budeme zavádět souřadnice pomocí zobrazení~${\phi: \Manif \to \R^n}$.
+
+\medskip
+
+Je-li stavový prostor izomorfní $\R^n$, proč je pro nás výhodné zavádět si varietu a nepracovat rovnou s $\R^n$? Ani termodynamický stavový prostor, ani varieta totiž nemají jednoznačně zadané souřadnice, přenos vektorů ani kanonický skalární součin, na které jsme v $\R^n$ tolik zvyklí. Práce na varietě nám tedy užitečná v tom, že nám nedovolí dělat operace, které nemají fyzikální smysl. Na stavovém prostoru budeme chtít derivovat a integrovat, pojďme si tedy na varietách zavést objekty, které nám to dovolí.
+
+\begin{definition}[Křivka]
+Buď varieta $\Manif$ a otevřený interval $I \subset \R$. Zobrazení $\gamma: I \to \Manif$ potom nazýváme křivka na $\Manif$. Vybereme-li si nějakou mapu $\phi$, zobrazení $\phi \circ \gamma: I \to \R^n$ nazýváme souřadnicovým vyjádřením křivky. Budeme požadovat, aby souřadnicová vyjádření křivek byla vždy alespoň po částech $\Cont^k$.
+\end{definition}
+
+\begin{definition}[Skalární pole, $\Func\Manif$]
+Mějme varietu $\Manif$. Zobrazení $f: \Manif \to \R$ se nazývá funkce na varietě, nebo také \textit{skalární pole}. Vybereme-li si nějakou mapu $\phi$, zobrazení $f \circ \phi^{-1}: \R^d \to \R$ nazýváme souřadnicovým vyjádřením pole, opět budeme požadovat, aby bylo alespoň $\Cont^k$. Prostor všech skalárních polí na varietě značíme $\Func\Manif$.
+\end{definition}
+
+\begin{definition}[Derivace křivky]
+Buď varieta $\Manif$, na ní křivka $\gamma: I \to \Manif$ a číslo $t_0 \in I$. Zobrazení
+\begin{align*}
+    \dot\gamma|_{t_0} &: \Func\Manif \to \R
+    &
+    \dot\gamma|_{t_0} (f) \; &\equiv \;
+    \dd{}{t} f(\gamma(t)) \Big|_{t = t_0}
+\end{align*}
+nazýváme derivací křivky v bodě $P=\gamma(t_0)$. Někdy ji také zapisujeme $\dot\gamma|_P$.
+\end{definition}
+
+Tuto definici se vyplatí důkladně rozmyslet. Vybereme-li si nějaký bod na varietě, právě zavedená konstrukce nám umožňuje vzít křivku $\gamma$, která bodem prochází, a skalární pole $f$ – složíme-li je dohromady, dostaneme číslo, jenž kvantifikuje, jak rychle se pole mění vzhledem ke křivce. Výraz $\dot\gamma|_P(f)$ je tedy derivace pole $f$ ve směru, který udává křivka $\gamma$. Zároveň ale, jak se vzápětí dozvíme, samotné zobrazení $\dot\gamma|_P$ (bez dosazení konkrétní funkce) můžeme chápat jako tečný vektor ke křivce. Nejprve se ale musíme trochu důkladněji podívat na souřadnice.
+
+\begin{definition}[Souřadnicové pole]
+Mějme varietu $\Manif$ a na ní mapu $\phi$, která každému\footnote{Tím je myšleno každému bodu v \textit{definičním oboru} $\phi$. Protože ale pracujeme na varietách izomorfních $\R^n$, je typicky možné zavádět souřadnice globální, tj. na celé varietě, proto se tímto detailem dále nebudeme zabývat.} bodu přiřazuje $n$-tici souřadnic.
+\begin{align*}
+    \phi(P) = (x_1, ... \, x_n)
+\end{align*}
+Z této $n$-tice si můžeme vybrat jednu souřadnici $x_j$, mapa nám potom udává skalární pole:
+\begin{align*}
+    \phi_j &\in \Func\Manif
+    &
+    \phi_j(P) &= x_j
+\end{align*}
+Takové pole se nazývá \textit{souřadnicové pole} souřadnice $x_j$ a je-li zřejmé, s jakou mapou pracujeme, bývá zvykem zapisovat ho místo „$\phi_j(P)$“ pouze jako „$x_j$“.
+\end{definition}
+
+\begin{definition}[Souřadnicová křivka]
+Mějme varietu $\Manif$, na ní mapu $\phi(P) = (x_1, ... \, x_m)$ a bod $P_0$ takový, že $\phi(P_0) = (p_1, ... \, p_n)$. Vybereme-li si $j$-tou souřadnici, můžeme definovat křivku
+\begin{align*}
+    \gamma \;=\;
+    t \mapsto
+    \phi^{-1}(p_1, ... \, p_{j-1}, \;\; p_j + t, \;\; p_{j+1}, ... \, p_n)
+    \: ,
+\end{align*}
+takové křivce říkáme \textit{souřadnicová křivka} souřadnice $x_j$ bodem $P_0$.
+\label{def:souradnicova-krivka}
+\end{definition}
+
+\begin{definition}[Derivavce podél souřadnice]
+    Buď varieta $\Manif$ a na ní mapa $\phi(P) = (x_1, ... \, x_n)$ a bod $P\in\Manif$. Vybereme si souřadnici $x_j$ a k ní souřadnicovou křivku $\gamma$, která prochází bodem $P$. Definujeme zobrazení
+    \begin{align*}
+        \pd{}{x_j} \Big|_P &:
+        \Func\Manif \to \R
+        &
+        \pd{}{x_j} \Big|_P (f)
+        \;&\equiv\;
+        \dot\gamma|_P(f)
+    \end{align*}
+    Toto zobrazení se nazývá \textit{derivace podél souřadnice} $x_j$ a aplikujeme-li ho na skalární pole $f$, dostaneme parciální derivaci jeho souřadnicového vyjádření.
+\end{definition}
+
+\begin{theorem}[O lineárním charakteru derivací]
+Buď varieta $\Manif$, na ní bod $P$ a křivky $\gamma, \f, ...$, které tímto bodem procházejí. Formálně definujeme lineární kombinace jejich derivací:
+\begin{gather*}
+    \forall s \in \R:
+    \qquad
+    v = \dot\gamma|_P + s \, \dot\f|_P
+    \qquad \iff \qquad
+    v(f) = \dot\gamma|_P(f) + s \, \dot\f|_P(f)
+    \quad \forall f \in \Func\Manif
+\end{gather*}
+Potom pro každou takovou lineární kombinaci existuje křivka $\chi$ taková, že $\dot\chi|_P = v$.
+Máme-li navíc na $\Manif$ mapu $\phi(P) = (x_1, ... \, x_n)$, potom je množina
+\begin{equation*}
+    B =
+    \Big\{
+        \pd{}{x_1}\Big|_P,
+        \; ... \;
+        \pd{}{x_n}\Big|_P
+    \Big\}
+\end{equation*}
+lineárně nezávislá a pro každou křivku $\chi$ procházející bodem $P$ platí, že se $\dot\chi|_P$ dá vyjádřit jako lineární kombinace prvků $B$. Množina $B$ tedy tvoří bázi lineárního prostoru všech derivací v bodě $P$.
+\end{theorem}
+\ph{.}\vspace{-2.5\baselineskip}
+\begin{wrapfigure}{r}{8cm}
+    \centering
+    \def\columnwidth{8cm}
+    \incfig{02_vektorova_baze}
+    \vspace{-2.2\baselineskip}
+    \caption{Jak křivky souřadnic $x_1$ a $x_2$ procházející bodem $P$ indukují vektory $\pd{}{x_1} \!\big|_P$ a $\pd{}{x_2} \!\big|_P$.}
+    \label{obr:vektor}
+    \vspace{-2\baselineskip}
+\end{wrapfigure}
+\begin{proof}
+Důkaz je přenechán jako cvičení čtenáři, zároveň je skvělou příležitostí ujistit se, že nově zavedeným konceptům dobře rozumíte.
+\medskip\\
+\textit{Nápověda:} Pokud umíte obdobný výsledek dokázat pro křivky na $\R^n$, máte vyhráno – stačí křivky zobrazit z $\Manif$ do $\R^n$ pomocí nějaké mapy, dokázat tvrzení, a zobrazit je zpátky do $\Manif$. Nakonec je ještě třeba ukázat, že lineární kombinace derivací jsou nezávislé na konkrétní volbě mapy.
+\end{proof}
+
+\begin{definition}[Tečný prostor, $\Tang_P\Manif$]
+    Mějme varietu $\Manif$ a na ní bod $P$. Prostor všech derivací v bodě $P$ (viz předchozí věta) nazveme \textit{tečný prostor} v bodě $P$ a označíme ho $\Tang_P\Manif$. Prvkům $\Tang_P\Manif$ říkáme směrové derivace, nebo jednoduše \textit{vektory}.
+\end{definition}
+
+Z lineární algebry víme, že máme-li vektorový prostor $V$, je velmi užitečné zadefinovat si k němu prostor \textit{kovektorů}, tj. lineárních funkcionálů $V \to \R$. Vztah mezi vektory a kovektory je velmi symetrický. I prostor všech kovektorů (značíme ho $V^*$, duální prostor k $V$) je lineárním prostorem a ačkoliv $V^*$ definujeme jako lineární funkcionály na $V$, stejně tak dobře bychom mohli začít s $V^*$ a definovat $V$ jako lineární funkcionály na $V^*$. Nejsymetričtější formulací tohoto vztahu je: \textit{„Dáme-li dohromady vektor a kovektor, dostaneme číslo.“}
+
+V termodynamice jsou kovektory obzvlášť důležité, pomocí nich budeme budovat celou teorii. Pojďme se nyní zamyslet: na varietě hrají směrové derivace v bodě $P$ roli vektorů, co jsou potom kovektory? Jednoho kandidáta bychom měli – složíme-li vektor $v \in \Tang_P\Manif$ se skalárním polem $f \in \Func\Manif$, dostaneme číslo $v(f) \in \R$. Tomu, aby byl prostor $\Func\Manif$ duálním prostorem k $\Tang_P\Manif$, brání v zásadě tři problémy. Působení vektorů z $\Tang_P\Manif$ na funkce $f,g\in\Func\Manif$ je totožné, pokud:
+\begin{enumerate}
+    \item $f,g$ se rovnají na okolí $P$ a jinde jsou různé
+    \item $f,g$ se liší o aditivní konstantu
+    \item lineární vývoj $f,g$ v bodě $P$ je stejný, liší se až ve vyšším řádu
+\end{enumerate}
+Prostor $\Func\Manif$ je tedy \textit{moc velký}, obsahuje příliš mnoho detailů. Jsme ale na dobré stopě: jako kovektory nám poslouží objekty, které budou popisovat lineární chování skalárních polí v bodě $P$. Takový koncept není pro fyzika nic nového, to je přeci gradient (či diferenciál, dle osobních preferencí)! A skutečně – ačkoliv to z abstraktní definice na první pohled není zřejmé, kovektory na varietách mají přesně tento fyzikální význam.
+
+\begin{definition}[Diferenciál v bodě]
+Buď varieta $\Manif$, $P \in \Manif$ a $f \in \Func\Manif$, definujeme zobrazení:
+\begin{align*}
+    \d{f}|_P &: \Tang_P\Manif \to \R
+    &
+    \d{f}|_P(v) &\equiv v(f)
+\end{align*}
+Takovému zobrazení říkáme \textit{diferenciál $f$ v bodě $P$}. Pozor, pojem „diferenciál“ (bez přívlastku „v bodě“) budeme používat pro kovetorová pole, ne samotné kovektory.
+\end{definition}
+
+\begin{theorem}[O lineárním charakteru diferenciálů v bodě]
+Buď varieta $\Manif$, na ní bod $P$ a skalární pole $f, g$. Definujeme lineární kombinace jejich diferenciálů:
+\begin{align*}
+    \forall s \in \R \quad
+    \forall v \in \Tang_P\Manif :
+    \qquad
+    \left( \d{f} + s \, \d{g} \right)(v)
+    \equiv
+    \d{f}(v) + s \, \d{g}(v)
+    =
+    \d{(f + s\,g)}(v)
+\end{align*}
+Potom diferenciály v bodě $P$ všech funkcí z $\Func\Manif$ tvoří lineární prostor, který je duální k $\Tang_P\Manif$. Máme-li navíc na $\Manif$ mapu $\phi(P) = (x_1, ... \, x_n)$, potom je množina diferenciálů souřadnicových polí
+\begin{align*}
+    B' = \big\{
+        \d{x_1}|_P,
+        \; ... \;
+        \d{x_n}|_P
+    \big\}
+\end{align*}
+bází tohoto lineárního prostoru a duální bází k
+\begin{align*}
+    B =
+    \Big\{
+        \pd{}{x_1}\Big|_P,
+        \; ... \;
+        \pd{}{x_n}\Big|_P
+    \Big\}
+    \: .
+\end{align*}
+\end{theorem}
+\ph{.} \vspace{-\baselineskip}
+\begin{wrapfigure}{r}{8cm}
+    \vspace{-\baselineskip}
+    \centering
+    \def\columnwidth{8cm}
+    \incfig{03_diferencial}
+    \vspace{-2.2\baselineskip}
+    \caption{Skalární pole $f$ a jeho diferenciály v bodech $P$ a $Q$. Funkce $f$ je zobrazená jako \textit{heatmapa}, tmavší oblasti odpovídají nižším hodnotám, světlejší vyšším.}
+    \label{obr:kovektor}
+    
+    \vspace{2\baselineskip}
+    \incfig{04_vektor_kovektor_znaceni}
+    \vspace{-2.2\baselineskip}
+    \caption{(zleva) velký vektor, malý vektor, velký kovektor, malý kovektor.}
+    \label{obr:vektor-kovektor-znaceni}
+    \vspace{-2\baselineskip}
+\end{wrapfigure}
+\begin{proof}
+Diferenciály v bodě už jsou zobrazení $\Tang_P\Manif \to \R$. Aby tvořily duální prostor, musí navíc platit
+\begin{equation*}
+    \d{f}|_P(v + s\,w) = \d{f}|_P(v) + s \, \d{f}|_P(w) \: ,
+\end{equation*}
+což plyne z linearity derivací. Aby $B'$ byla duální bází k $B$, musí platit
+\begin{equation*}
+    \d{x_i}|_P(\, \pd{}{x_j}\Big|_P \,)
+    \equiv \pd{}{x_j}\Big|_P( x_i )
+    = \delta_{ij}
+\end{equation*}
+vektor $\pd{}{x_j}$ je ale derivací souřadnicové křivky, kterou v \ref{def:souradnicova-krivka} definujeme tak, že se podél ní mění pouze $x_j$ a žádná jiná souřadnice. Rovnost je tedy naplněna.
+\end{proof}
+
+\begin{definition}[Kotečný prostor, $\Tang^*_P\Manif$]
+    Mějme varietu $\Manif$ a na ní bod $P$. Prostor všech diferenciálů v bodě $P$ (viz předchozí věta) nazveme \textit{kotečný prostor} v bodě $P$ a označíme ho $\Tang^*_P\Manif$. Prvkům $\Tang^*_P\Manif$ říkáme diferenciály v bodě $P$, nebo jednoduše \textit{kovektory}.
+\end{definition}
+
+Na $n$-rozměrné varietě je možné každé funkci $f$ definovat sadu „vrstevnic“ – $(n-1)$-rozměrných podprostorů, na kterých $f=\konst$ O diferenciálu $f$ v nějakém bodě je potom výhodné přemýslet jako o sadě tečných (nad)rovin k takovým vrstevnicím (viz obrázek \ref{obr:kovektor}). Euklidovskému člověku by se chtělo říci, že jsou to roviny kolmé ke směru nejrychlejšího růstu $f$, protože ale nemáme žádný skalární součin, nemůžeme zadefinovat ani kolmost, ani směr nejrychlejšího růstu.
+
+Ve 2D je zvykem kreslit kovektory jako sadu rovnoběžných úseček (viz obrázek \ref{obr:vektor-kovektor-znaceni}), které se postupně zužují – vizuálně tak tvoří takovou „šipku“ v kladném směru, tedy například ve směru růstu nějaké funkce. Velikost kovektoru potom značíme tak, že úsečky nakreslíme více či méně hustě, vzdálenost mezi úsečkami je nepřímo úměrná velikosti kovektoru. Je ale potřeba pamatovat, že na $\Tang_P\Manif$ nemáme žádnou normu, absolutní velikost vektorů ani kovektorů tedy nemůžeme porovnávat. Určitě ale můžeme porovnávat relativní velikost dvou vektorů (nebo dvou kovektorů), které míří stejným směrem: $v$ je $s$-krát delší než $w$, pokud $v=s\,w$.
+
+\begin{theorem}[O transformaci vektorů a kovektorů]
+TODO
+\end{theorem}
+
+\begin{exercise}
+TODO
+\end{exercise}
+
+\section{Vektorová pole a diferenciály}
+
+
+\end{document}
